@@ -1,5 +1,5 @@
 requests
-flask
 PySide6
 python-dotenv
 pyinstaller
+keyring

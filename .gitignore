@@ -6,3 +6,10 @@ dist/
 local_configs.json
 settings.json
 core/
+__pycache__/
+*.pyc
+vpn_server.db
+.venv
+test.py
+darkvpn.settings
+darkcatvpn.settings

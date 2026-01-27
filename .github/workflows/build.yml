@@ -1,0 +1,66 @@
+name: Build and Release DarkCat-VPN (Windows)
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: windows-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+          cache: 'pip'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install pyinstaller pyside6
+          if (Test-Path requirements.txt) { pip install -r requirements.txt }
+
+      - name: Build EXE with PyInstaller
+        run: |
+          pyinstaller --noconfirm --onefile --windowed `
+          --name "DarkCatVPN" `
+          client.py
+
+      - name: Prepare Release Bundle
+        shell: pwsh
+        run: |
+          $tagName = "${{ github.ref_name }}"
+          $zipName = "DarkCat_VPN_$tagName.zip"
+          $bundleDir = "Release_Bundle"
+
+          if (Test-Path $bundleDir) { Remove-Item -Recurse -Force $bundleDir }
+          New-Item -ItemType Directory -Path $bundleDir
+
+          Copy-Item "dist\DarkCatVPN.exe" -Destination "$bundleDir\"
+
+          if (Test-Path "core") {
+              Copy-Item -Path "core" -Destination "$bundleDir\" -Recurse
+          }
+
+          Compress-Archive -Path "$bundleDir\*" -DestinationPath "$zipName"
+
+          echo "ASSET_NAME=$zipName" >> $env:GITHUB_ENV
+
+      - name: Upload to GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ASSET_NAME }}
+          name: "Release ${{ github.ref_name }}"
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

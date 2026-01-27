@@ -5,7 +5,7 @@ dist/
 *.db
 local_configs.json
 settings.json
-core/
+core/config.json
 __pycache__/
 *.pyc
 vpn_server.db

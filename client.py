@@ -442,8 +442,8 @@ class EditConfigDialog(QDialog):
         new_pass = self.new_pass_inp.text()
         if not new_pass:
             return
-        if len(new_pass) < 12:
-            QMessageBox.warning(self, "Ошибка", "Пароль должен быть не менее 12 символов.")
+        if len(new_pass) < 8:
+            QMessageBox.warning(self, "Ошибка", "Пароль должен быть не менее 8 символов.")
             return
 
         _, error = ApiClient.reset_password(self.target_user, new_pass)
@@ -644,8 +644,8 @@ class RegisterScreen(QWidget):
     def do_reg(self):
         username = self.u.text()
         password = self.p.text()
-        if not (username and password and len(password) >= 12):
-            QMessageBox.warning(self, "Ошибка", "Требуется имя пользователя и пароль не менее 12 символов.")
+        if not (username and password and len(password) >= 8):
+            QMessageBox.warning(self, "Ошибка", "Требуется имя пользователя и пароль не менее 8 символов.")
             return
 
         _, error = ApiClient.register(username, password)
